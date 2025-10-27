@@ -1,25 +1,111 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Link } from 'expo-router';
+import { Ionicons } from "@expo/vector-icons";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
+import { BurgerCard } from "../components/BurgerCard";
+import { useFetch } from "../hooks/useFetch";
+import { Burger } from "../types/Burger";
+
+const baseUrl = "https://68e6374d21dd31f22cc4a475.mockapi.io/";
 
 export default function BurgerList() {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>🍔 Burger List</Text>
-      <Text style={styles.subtitle}>Welcome to BurgerFast Home!</Text>
+  const [burgers, setBurgers] = useState<Burger[]>([]);
+  const [search, setSearch] = useState("");
+  const { isLoading, get } = useFetch(baseUrl);
 
-      <Link href="/(tabs)/pay" asChild>
-        <TouchableOpacity style={styles.btn}>
-          <Text style={styles.btnText}>Go to Payment</Text>
-        </TouchableOpacity>
-      </Link>
-    </View>
+  const fetchData = useCallback(async () => {
+    const data = await get<Burger>("/burgers");
+    setBurgers(data);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const filtered = burgers.filter((b) =>
+    b.description.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>BurgerFast</Text>
+      </View>
+
+      <View style={styles.searchBox}>
+        <Ionicons name="search" size={20} color="#999" />
+        <TextInput
+          placeholder="Search"
+          style={styles.input}
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
+
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#000" />
+      ) : (
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => <BurgerCard data={item} />}
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#25292e', justifyContent: 'center', alignItems: 'center' },
-  title: { color: '#ffd33d', fontSize: 28, fontWeight: 'bold', marginBottom: 10 },
-  subtitle: { color: '#fff', marginBottom: 20 },
-  btn: { backgroundColor: '#ffd33d', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 8 },
-  btnText: { color: '#25292e', fontWeight: 'bold' },
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 16,
+  },
+  header: {
+    paddingVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#000",
+  },
+  addressLabel: {
+    fontSize: 14,
+    color: "#999",
+  },
+  address: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginVertical: 4,
+  },
+  searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  input: {
+    marginLeft: 8,
+    flex: 1,
+  },
+  list: {
+    paddingBottom: 20,
+  },
+   
 });

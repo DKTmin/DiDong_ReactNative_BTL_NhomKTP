@@ -15,7 +15,7 @@ import { Burger } from "../types/Burger";
 
 const baseUrl = "https://68e6374d21dd31f22cc4a475.mockapi.io/";
 
-export default function BurgerList() {
+export default function Home() {
   const [burgers, setBurgers] = useState<Burger[]>([]);
   const [search, setSearch] = useState("");
   const { isLoading, get } = useFetch(baseUrl);
@@ -107,5 +107,5 @@ const styles = StyleSheet.create({
   list: {
     paddingBottom: 20,
   },
-   
+
 });

@@ -1,94 +1,131 @@
-import { Link } from 'expo-router';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { Ionicons } from "@expo/vector-icons";
+import { Link } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { BurgerCard } from "./components/BurgerCard";
+import { useFetch } from "./hooks/useFetch";
+import { Burger } from "./types/Burger";
 
-export default function GetStarted() {
+const baseUrl = "https://68e6374d21dd31f22cc4a475.mockapi.io/";
+
+export default function BurgerList() {
+  const [burgers, setBurgers] = useState<Burger[]>([]);
+  const [search, setSearch] = useState("");
+  const { isLoading, get } = useFetch(baseUrl);
+
+  const fetchData = useCallback(async () => {
+    const data = await get<Burger>("/burgers");
+    setBurgers(data);
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const filtered = burgers.filter((b) =>
+    b.description.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <View style={styles.container}>
-      {/* Logo */}
-      <Image
-        source={require('../assets/images/Logo_GetStarted.png')} 
-        style={styles.logo}
-        resizeMode="contain"
-      />
+    <SafeAreaView style={styles.container}>
+      {/* Header */}
+      <View style={styles.header}>
+        <Text style={styles.title}>BurgerFast</Text>
 
-      {/* Title */}
-      <Text style={styles.title}>BURGERFAST</Text>
-
-      {/* Subtitle */}
-      <Text style={styles.subtitle}>We make burgers to die for</Text>
-
-      {/* Buttons */}
-      <View style={styles.buttons}>
-        {/* Sign in */}
+        {/* Nút đăng nhập có icon + chữ */}
         <Link href="/sign_in" asChild>
-          <TouchableOpacity style={styles.signInBtn}>
-            <Text style={styles.signInText}>Sign in</Text>
-          </TouchableOpacity>
-        </Link>
-
-        {/* Get started */}
-        <Link href="/sign_up" asChild>
-          <TouchableOpacity style={styles.getStartedBtn}>
-            <Text style={styles.getStartedText}>Get started →</Text>
+          <TouchableOpacity style={styles.loginBtn}>
+            <Ionicons name="person-circle-outline" size={24} color="#000" />
+            <Text style={styles.loginText}>Sign In</Text>
           </TouchableOpacity>
         </Link>
       </View>
-    </View>
+
+
+      {/* Ô tìm kiếm */}
+      <View style={styles.searchBox}>
+        <Ionicons name="search" size={20} color="#999" />
+        <TextInput
+          placeholder="Search"
+          style={styles.input}
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
+
+      {/* Danh sách */}
+      {isLoading ? (
+        <ActivityIndicator size="large" color="#000" />
+      ) : (
+        <FlatList
+          data={filtered}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          contentContainerStyle={styles.list}
+          renderItem={({ item }) => <BurgerCard data={item} />}
+        />
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 30,
+    backgroundColor: "#F5F5F5",
+    paddingHorizontal: 16,
   },
-  logo: {
-    width: 180,
-    height: 180,
-    marginBottom: 20,
+  header: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-    color: '#000',
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#000",
   },
-  subtitle: {
+  loginBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#ff8c00",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+  },
+  searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  input: {
+    marginLeft: 8,
+    flex: 1,
+  },
+  list: {
+    paddingBottom: 20,
+  },
+  loginText: {
+    color: "#fff",
     fontSize: 14,
-    color: '#555',
-    marginTop: 8,
-    marginBottom: 50,
-  },
-  buttons: {
-    width: '100%',
-    alignItems: 'center',
-  },
-  signInBtn: {
-    width: '100%',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  signInText: {
-    color: '#000',
-    fontSize: 16,
-  },
-  getStartedBtn: {
-    width: '100%',
-    backgroundColor: '#ff8c00',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  getStartedText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
+    marginLeft: 6,
   },
 });

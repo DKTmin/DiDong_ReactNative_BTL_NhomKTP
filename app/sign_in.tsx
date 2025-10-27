@@ -52,7 +52,7 @@ export default function SignIn() {
       </View>
 
       {/* Sign In Button */}
-      <TouchableOpacity style={styles.signInBtn} onPress={() => router.replace('/(tabs)')}>
+      <TouchableOpacity style={styles.signInBtn} onPress={() => router.replace('/(tabs)/home')}>
         <Text style={styles.signInText}>Sign in →</Text>
       </TouchableOpacity>
 

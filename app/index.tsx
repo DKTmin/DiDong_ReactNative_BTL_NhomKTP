@@ -1,31 +1,36 @@
 import { Link } from 'expo-router';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 
 export default function GetStarted() {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🍔 BurgerFast</Text>
-      <Text style={styles.subtitle}>Welcome to the fastest burger app!</Text>
+      {/* Logo */}
+      <Image
+        source={require('../assets/images/Logo_GetStarted.png')} 
+        style={styles.logo}
+        resizeMode="contain"
+      />
 
+      {/* Title */}
+      <Text style={styles.title}>BURGERFAST</Text>
+
+      {/* Subtitle */}
+      <Text style={styles.subtitle}>We make burgers to die for</Text>
+
+      {/* Buttons */}
       <View style={styles.buttons}>
-        {/* <Link href="/sign_in" asChild>
-          <TouchableOpacity style={styles.btn}>
-            <Text style={styles.btnText}>Sign In</Text>
+        {/* Sign in */}
+        <Link href="/sign_in" asChild>
+          <TouchableOpacity style={styles.signInBtn}>
+            <Text style={styles.signInText}>Sign in</Text>
           </TouchableOpacity>
-        </Link> */}
-
-        <Link href="/sign_in" style={styles.btn}>
-          <Text style={styles.btnText}>Sign In</Text>
         </Link>
 
-        {/* <Link href="/sign_up" asChild>
-          <TouchableOpacity style={[styles.btn, styles.outlineBtn]}>
-            <Text style={styles.btnText}>Sign Up</Text>
+        {/* Get started */}
+        <Link href="/sign_up" asChild>
+          <TouchableOpacity style={styles.getStartedBtn}>
+            <Text style={styles.getStartedText}>Get started →</Text>
           </TouchableOpacity>
-        </Link> */}
-
-        <Link href="/sign_up" style={styles.btn}>
-          <Text style={styles.btnText}>Sign Up</Text>
         </Link>
       </View>
     </View>
@@ -33,11 +38,57 @@ export default function GetStarted() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#25292e', justifyContent: 'center', alignItems: 'center' },
-  title: { fontSize: 36, fontWeight: 'bold', color: '#ffd33d', marginBottom: 10 },
-  subtitle: { color: '#fff', fontSize: 16, marginBottom: 40 },
-  buttons: { flexDirection: 'row', gap: 16 },
-  btn: { backgroundColor: '#ffd33d', paddingVertical: 12, paddingHorizontal: 24, borderRadius: 8 },
-  outlineBtn: { backgroundColor: '#ffb800' },
-  btnText: { color: '#25292e', fontWeight: 'bold', fontSize: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 30,
+  },
+  logo: {
+    width: 180,
+    height: 180,
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+    color: '#000',
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#555',
+    marginTop: 8,
+    marginBottom: 50,
+  },
+  buttons: {
+    width: '100%',
+    alignItems: 'center',
+  },
+  signInBtn: {
+    width: '100%',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  signInText: {
+    color: '#000',
+    fontSize: 16,
+  },
+  getStartedBtn: {
+    width: '100%',
+    backgroundColor: '#ff8c00',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  getStartedText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
 });

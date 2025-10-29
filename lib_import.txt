@@ -1,3 +1,4 @@
 npm install
 npx expo install expo-checkbox
 npx expo install react-native-paper
+npx expo install axios

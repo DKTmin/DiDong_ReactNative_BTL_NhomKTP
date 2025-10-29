@@ -1,111 +1,173 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useCallback, useEffect, useState } from "react";
+import { useNavigation } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
-  SafeAreaView,
+  Image,
   StyleSheet,
   Text,
   TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
-import { BurgerCard } from "../components/BurgerCard";
-import { useFetch } from "../hooks/useFetch";
-import { Burger } from "../types/Burger";
+import { useCart } from "../context/CartContext";
 
-const baseUrl = "https://68e6374d21dd31f22cc4a475.mockapi.io/";
+const imageMap: Record<string, any> = {
+  "ChickenCajun.png": require("../images/ChickenCajun.png"),
+  "DoubleBeef.png": require("../images/DoubleBeef.png"),
+  "CheeseDeluxe.png": require("../images/CheeseDeluxe.png"),
+  "SpicyGrill.png": require("../images/SpicyGrill.png"),
+  "BaconLovers.png": require("../images/BaconLovers.png"),
+  "VeggieDelight.png": require("../images/VeggieDelight.png"),
+};
 
-export default function Home() {
+interface Burger {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  imageName: string;
+}
+
+export default function HomeScreen() {
   const [burgers, setBurgers] = useState<Burger[]>([]);
   const [search, setSearch] = useState("");
-  const { isLoading, get } = useFetch(baseUrl);
-
-  const fetchData = useCallback(async () => {
-    const data = await get<Burger>("/burgers");
-    setBurgers(data);
-  }, []);
+  const [loading, setLoading] = useState(true);
+  const navigation = useNavigation<any>();
+  const { addToCart } = useCart();
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(
+          "https://6900db32ff8d792314bbc8f2.mockapi.io/burgers"
+        );
+        const data = await res.json();
+        setBurgers(data);
+      } catch (err) {
+        Alert.alert("Lỗi", "Không thể tải danh sách Burger");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchData();
   }, []);
 
   const filtered = burgers.filter((b) =>
-    b.description.toLowerCase().includes(search.toLowerCase())
+    b.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color="#ff9900" />
+      </View>
+    );
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>BurgerFast</Text>
+        <Text style={styles.headerText}>BurgerFast</Text>
       </View>
+      <Text style={styles.title}>
+        🍔 Xin chào! Mời bạn chọn Burger yêu thích
+      </Text>
 
-      <View style={styles.searchBox}>
-        <Ionicons name="search" size={20} color="#999" />
-        <TextInput
-          placeholder="Search"
-          style={styles.input}
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
+      <TextInput
+        style={styles.search}
+        placeholder="Tìm kiếm Burger..."
+        value={search}
+        onChangeText={setSearch}
+      />
 
-      {isLoading ? (
-        <ActivityIndicator size="large" color="#000" />
-      ) : (
-        <FlatList
-          data={filtered}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          contentContainerStyle={styles.list}
-          renderItem={({ item }) => <BurgerCard data={item} />}
-        />
-      )}
-    </SafeAreaView>
+      <FlatList
+        data={filtered}
+        keyExtractor={(item) => item.id}
+        numColumns={2}
+        columnWrapperStyle={{ justifyContent: "space-between" }}
+        renderItem={({ item }) => {
+          const localImage = imageMap[item.imageName] || null;
+
+          return (
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() =>
+                navigation.navigate("burgerDetail", {
+                  burger: JSON.stringify(item),
+                })
+              }
+            >
+              {localImage ? (
+                <Image source={localImage} style={styles.image} />
+              ) : (
+                <View style={[styles.image, styles.imagePlaceholder]}>
+                  <Text>Ảnh lỗi</Text>
+                </View>
+              )}
+
+              <Text style={styles.name}>{item.name}</Text>
+              <Text style={styles.price}>{item.price.toLocaleString()}₫</Text>
+
+              <TouchableOpacity
+                style={styles.cartButton}
+                onPress={() => {
+                  addToCart({ ...item, image: localImage });
+                  Alert.alert("✅ Đã thêm vào giỏ hàng");
+                }}
+              >
+                <Ionicons name="cart" size={20} color="#fff" />
+              </TouchableOpacity>
+            </TouchableOpacity>
+          );
+        }}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5F5",
-    paddingHorizontal: 16,
-  },
+  container: { flex: 1, backgroundColor: "#fff", padding: 15 },
   header: {
     paddingVertical: 20,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#fff",
   },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#000",
+  headerText: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  title: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
+  search: {
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 15,
   },
-  addressLabel: {
-    fontSize: 14,
-    color: "#999",
-  },
-  address: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginVertical: 4,
-  },
-  searchBox: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#fff",
+  card: {
+    backgroundColor: "#f9f9f9",
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginTop: 16,
-    marginBottom: 8,
+    width: "48%",
+    padding: 10,
+    marginBottom: 15,
+    position: "relative",
   },
-  input: {
-    marginLeft: 8,
-    flex: 1,
+  image: { width: "100%", height: 120, borderRadius: 10 },
+  imagePlaceholder: {
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#eee",
   },
-  list: {
-    paddingBottom: 20,
+  name: { fontSize: 16, fontWeight: "bold", marginTop: 5 },
+  price: { color: "#ff9900", fontWeight: "600" },
+  cartButton: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    backgroundColor: "#ff9900",
+    padding: 6,
+    borderRadius: 8,
   },
-
 });

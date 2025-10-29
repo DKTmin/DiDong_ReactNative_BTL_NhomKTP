@@ -31,7 +31,7 @@ export default function CartScreen() {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <View style={styles.card}>
-                <Image source={{ uri: item.image }} style={styles.image} />
+                <Image source={item.image} style={styles.image} />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.name}>{item.name}</Text>
                   <Text style={styles.price}>

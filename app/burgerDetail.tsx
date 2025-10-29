@@ -8,15 +8,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useCart } from "../context/CartContext";
+import { useCart } from "./context/CartContext";
 
 const imageMap: Record<string, any> = {
-  "ChickenCajun.png": require("../images/ChickenCajun.png"),
-  "DoubleBeef.png": require("../images/DoubleBeef.png"),
-  "CheeseDeluxe.png": require("../images/CheeseDeluxe.png"),
-  "SpicyGrill.png": require("../images/SpicyGrill.png"),
-  "BaconLovers.png": require("../images/BaconLovers.png"),
-  "VeggieDelight.png": require("../images/VeggieDelight.png"),
+  "ChickenCajun.png": require("./images/ChickenCajun.png"),
+  "DoubleBeef.png": require("./images/DoubleBeef.png"),
+  "CheeseDeluxe.png": require("./images/CheeseDeluxe.png"),
+  "SpicyGrill.png": require("./images/SpicyGrill.png"),
+  "BaconLovers.png": require("./images/BaconLovers.png"),
+  "VeggieDelight.png": require("./images/VeggieDelight.png"),
 };
 
 export default function BurgerDetail() {
